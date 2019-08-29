@@ -84,6 +84,7 @@ class TargetStatus(Enum):
     SUBMITTED = 1  #: The target has been submitted, but is not currently running.
     RUNNING = 2  #: The target is currently running.
     COMPLETED = 3  #: The target has completed and should not run.
+    FAILED = 4     #: The target has failed and should run.
 
 
 class AnonymousTarget:
@@ -818,7 +819,7 @@ class Scheduler:
         logger.debug("Scheduling target %s", target)
 
         if (
-            self.backend.status(target) != Status.UNKNOWN
+            self.backend.status(target) not in (Status.UNKNOWN, Status.FAILED)
             or target in self._pretend_known
         ):
             logger.debug("Target %s has already been submitted", target)
@@ -919,6 +920,13 @@ class Scheduler:
                 oldest_out_ts,
             )
             return True
+
+        if self.backend.status(target) == Status.FAILED:
+            logger.debug(
+                "%s should run because it failed",
+                target
+            )
+            return True
         return False
 
     def status(self, target: Target) -> TargetStatus:
@@ -931,6 +939,8 @@ class Scheduler:
             The target to return status for.
         """
         status = self.backend.status(target)
+        if status == Status.FAILED:
+            return TargetStatus.FAILED
         if status == Status.UNKNOWN:
             if self.should_run(target):
                 return TargetStatus.SHOULDRUN

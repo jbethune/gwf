@@ -21,6 +21,14 @@ SLURM_JOB_STATES = defaultdict(
         "S": Status.RUNNING,  # SUSPENDED
         "PD": Status.SUBMITTED,  # PENDING
         "SE": Status.SUBMITTED,  # SPECIAL_EXIT
+        "BF": Status.FAILED,
+        "CA": Status.FAILED,
+        "DL": Status.FAILED,
+        "F": Status.FAILED,
+        "NF": Status.FAILED,
+        "OOM": Status.FAILED,
+        "PR": Status.FAILED,
+        "TO": Status.FAILED,
     },
 )
 
@@ -145,10 +153,7 @@ class SlurmBackend(Backend):
         self._tracked = PersistableDict(path=".gwf/slurm-backend-tracked.json")
 
     def status(self, target):
-        try:
-            return self._get_status(target)
-        except KeyError:
-            return Status.UNKNOWN
+        return self._get_status(target)
 
     def submit(self, target, dependencies):
         script = self._compile_script(target)
@@ -226,8 +231,11 @@ class SlurmBackend(Backend):
         self._tracked[target.name] = job_id
 
     def _get_status(self, target):
-        job_id = self.get_job_id(target)
-        return self._status[job_id]
+        try:
+            job_id = self.get_job_id(target)
+            return self._status[job_id]
+        except KeyError:
+            return Status.UNKNOWN
 
     def _set_status(self, target, status):
         job_id = self.get_job_id(target)

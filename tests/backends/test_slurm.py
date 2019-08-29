@@ -46,7 +46,7 @@ def test_initialization(tmpdir, popen):
     with tmpdir.as_cwd():
         backend = SlurmBackend()
         assert backend.status(t1) == Status.RUNNING
-        assert backend.status(t2) == Status.UNKNOWN
+        assert backend.status(t2) == Status.FAILED
         assert backend.status(t3) == Status.SUBMITTED
         assert backend.status(t4) == Status.UNKNOWN
 

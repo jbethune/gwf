@@ -66,6 +66,7 @@ class Status(Enum):
     )  #: The backend is not aware of the status of this target (it may be completed or failed).
     SUBMITTED = 1  #: The target has been submitted, but is not currently running.
     RUNNING = 2  #: The target is currently running.
+    FAILED = 3  #: The target execution failed.
 
 
 def check_options(func, supported_options, super_options):

@@ -10,6 +10,7 @@ STATUS_COLORS = {
     TargetStatus.SUBMITTED: "yellow",
     TargetStatus.RUNNING: "blue",
     TargetStatus.COMPLETED: "green",
+    TargetStatus.FAILED: "red",
 }
 
 
@@ -67,7 +68,7 @@ def print_table(backend, graph, targets):
 @click.option(
     "-s",
     "--status",
-    type=click.Choice(["shouldrun", "submitted", "running", "completed"]),
+    type=click.Choice(["shouldrun", "submitted", "running", "completed", "failed"]),
     multiple=True,
 )
 @click.pass_obj
